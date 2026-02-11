@@ -7,9 +7,11 @@ import matplotlib.pyplot as plt
 
 # --- CONFIGURATION ---
 PROJECT_ROOT = Path(__file__).parent.parent
-WORKING_DATA = PROJECT_ROOT / "Working_data\Sample_Data"
+WORKING_DATA = PROJECT_ROOT / "Working_data"
+SAMPLE_DATA = WORKING_DATA / "Sample_Data"
 CATEGORIES_FILE = WORKING_DATA / "02_Data_Categories.json"
 CLEANING_FILE = WORKING_DATA / "04_Data_Cleaning_actions.json"
+DESCRIPTIONS_FILE = WORKING_DATA / "00_column_descriptions.json"
 
 # --- STORAGE FUNCTIONS ---
 def load_categories():
@@ -25,6 +27,15 @@ def load_cleaning_actions():
     if CLEANING_FILE.exists():
         try:
             with open(CLEANING_FILE, 'r') as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return {}
+    return {}
+
+def load_descriptions():
+    if DESCRIPTIONS_FILE.exists():
+        try:
+            with open(DESCRIPTIONS_FILE, 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
             return {}
@@ -298,13 +309,14 @@ def main():
     # Load data
     categories = load_categories()
     cleaning_actions = load_cleaning_actions()
+    descriptions = load_descriptions()
     
     if not categories:
         st.error("❌ No column categories found. Run Data_Profiler.py first!")
         return
     
     # File selector
-    csv_files = sorted(list(WORKING_DATA.glob("sample_*.csv")))
+    csv_files = sorted(list(SAMPLE_DATA.glob("sample_*.csv")))
     file_names = [f.name for f in csv_files]
     
     selected_file = st.selectbox("Select File", file_names)
@@ -313,7 +325,10 @@ def main():
         return
     
     # Load CSV
-    df = pd.read_csv(WORKING_DATA / selected_file)
+    df = pd.read_csv(SAMPLE_DATA / selected_file)
+    
+    # Get descriptions for this file
+    file_descriptions = descriptions.get(selected_file, {})
     
     # Initialize cleaning actions for this file
     if selected_file not in cleaning_actions:
@@ -324,14 +339,36 @@ def main():
     
     st.markdown("---")
     
-    # Process int and float columns only
+    # Process int, float, date, and IGNORE columns
     for col_name in df.columns:
         category = file_categories.get(col_name, "Not Categorized")
         
-        if category not in ['int', 'float', 'date']:
+        if category not in ['int', 'float', 'date', 'IGNORE']:
             continue
         
-        st.subheader(f"📊 {col_name} ({category})")
+        # Display IGNORE columns differently
+        if category == 'IGNORE':
+            st.markdown(f"### 🗑️ {col_name} (IGNORE)")
+            col_desc = file_descriptions.get(col_name, "")
+            if col_desc:
+                st.caption(f"ℹ️ {col_desc}")
+            
+            # Grey container
+            st.markdown("""
+                <div style="background-color: #2b2b2b; padding: 10px; border-radius: 5px; border-left: 4px solid #666;">
+                    <span style="color: #999;">This column is being ignored</span>
+                </div>
+            """, unsafe_allow_html=True)
+            st.markdown("---")
+            continue
+        
+        # Display column header with description tooltip if available
+        col_desc = file_descriptions.get(col_name, "")
+        if col_desc:
+            st.subheader(f"📊 {col_name} ({category})")
+            st.caption(f"ℹ️ {col_desc}")
+        else:
+            st.subheader(f"📊 {col_name} ({category})")
         
         # Initialize actions for this column
         if col_name not in cleaning_actions[selected_file]:

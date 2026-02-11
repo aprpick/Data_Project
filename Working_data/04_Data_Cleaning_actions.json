@@ -280,7 +280,7 @@
     },
     "class": {
       "category": "int",
-      "parsing_errors": "keep",
+      "parsing_errors": "median",
       "outliers": "keep",
       "negatives": "keep",
       "missing": "keep",
@@ -323,7 +323,7 @@
       "parsing_errors": "keep",
       "outliers": "cap",
       "negatives": "keep",
-      "missing": "keep",
+      "missing": "median",
       "outlier_threshold": 3.0
     },
     "num_rooms": {
@@ -331,7 +331,7 @@
       "parsing_errors": "keep",
       "outliers": "cap",
       "negatives": "keep",
-      "missing": "keep",
+      "missing": "median",
       "outlier_threshold": 3.0
     },
     "num_full_baths": {
@@ -339,7 +339,7 @@
       "parsing_errors": "keep",
       "outliers": "cap",
       "negatives": "keep",
-      "missing": "keep",
+      "missing": "median",
       "outlier_threshold": 3.0
     },
     "num_half_baths": {
@@ -355,7 +355,7 @@
       "parsing_errors": "keep",
       "outliers": "cap",
       "negatives": "keep",
-      "missing": "keep",
+      "missing": "median",
       "outlier_threshold": 3.0
     },
     "garage_size": {

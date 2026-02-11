@@ -4,10 +4,14 @@ from pathlib import Path
 import json
 import re
 
+"streamlit run Working_data/01_Data_Categorizer.py"
+
 # --- CONFIGURATION ---
 PROJECT_ROOT = Path(__file__).parent.parent
-WORKING_DATA = PROJECT_ROOT / "Working_data\Sample_Data"
+WORKING_DATA = PROJECT_ROOT / "Working_data"
+SAMPLE_DATA = WORKING_DATA / "Sample_Data"  # ← Add this
 CONFIG_FILE = WORKING_DATA / "02_Data_Categories.json"
+DESCRIPTIONS_FILE = WORKING_DATA / "00_column_descriptions.json"
 CATEGORIES = ["int", "float", "date", "string", "IGNORE"]
 
 # --- STORAGE FUNCTIONS ---
@@ -15,6 +19,15 @@ def load_categories():
     if CONFIG_FILE.exists():
         try:
             with open(CONFIG_FILE, 'r') as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return {}
+    return {}
+
+def load_descriptions():
+    if DESCRIPTIONS_FILE.exists():
+        try:
+            with open(DESCRIPTIONS_FILE, 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
             return {}
@@ -166,9 +179,10 @@ def main():
         return
 
     # Load files
-    csv_files = sorted(list(WORKING_DATA.glob("sample_*.csv")))
+    csv_files = sorted(list(SAMPLE_DATA.glob("sample_*.csv")))
     file_names = [f.name for f in csv_files]
     saved_data = load_categories()
+    descriptions = load_descriptions()
     
     # File Selector
     col_sel, col_prog = st.columns([1, 2])
@@ -178,9 +192,12 @@ def main():
     if not selected_file: return
     
     # Load Data
-    file_path = WORKING_DATA / selected_file
+    file_path = SAMPLE_DATA / selected_file
     df = pd.read_csv(file_path)
     if selected_file not in saved_data: saved_data[selected_file] = {}
+    
+    # Get descriptions for this file
+    file_descriptions = descriptions.get(selected_file, {})
 
     # Stats
     total_cols = len(df.columns)
@@ -235,10 +252,13 @@ def main():
         
         # UI Container
         with st.container(border=True):
-            # Header
+            # Header with tooltip if description exists
+            col_desc = file_descriptions.get(col, "")
+            tooltip_html = f' <span title="{col_desc}" style="cursor:help;">ℹ️</span>' if col_desc else ''
+            
             st.markdown(f"""
                 <div class="{header_class}">
-                    <b>{icon} {col}</b> <span style="float:right; opacity:0.7; font-size:0.9em">{auto_msg}</span>
+                    <b>{icon} {col}{tooltip_html}</b> <span style="float:right; opacity:0.7; font-size:0.9em">{auto_msg}</span>
                 </div>
             """, unsafe_allow_html=True)
             

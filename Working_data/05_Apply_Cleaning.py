@@ -8,7 +8,7 @@ import sys
 # --- CONFIGURATION ---
 PROJECT_ROOT = Path(__file__).parent.parent  # Script is in Working_data, parent is project root
 RAW_DATA = PROJECT_ROOT / "Raw_Data"
-CLEANED_DATA = PROJECT_ROOT / "Working_data\Cleaned_Data"
+CLEANED_DATA = PROJECT_ROOT / "Cleaned_Data"
 WORKING_DATA = PROJECT_ROOT / "Working_data"
 CATEGORIES_FILE = WORKING_DATA / "02_Data_Categories.json"
 CLEANING_FILE = WORKING_DATA / "04_Data_Cleaning_actions.json"
@@ -263,7 +263,7 @@ def process_csv(csv_path, categories, cleaning_actions):
     
     # Validate configs
     if not validate_configs(categories, cleaning_actions, csv_filename):
-        return False
+        return False, None
     
     # Find matching category key
     cat_key = None
@@ -300,7 +300,6 @@ def process_csv(csv_path, categories, cleaning_actions):
     
     # Process in chunks
     output_path = CLEANED_DATA / f"Cleaned_{csv_filename}"
-    chunk_stats = []
     first_chunk = True
     total_rows_output = 0
     
@@ -316,7 +315,6 @@ def process_csv(csv_path, categories, cleaning_actions):
         for col, cat in cols_to_clean.items():
             if col in chunk.columns and col in file_actions:
                 chunk, stats = apply_column_cleaning(chunk, col, file_actions[col], cat)
-                chunk_stats.append((col, stats))
         
         # Write chunk
         chunk.to_csv(output_path, mode='w' if first_chunk else 'a', header=first_chunk, index=False)
@@ -329,7 +327,19 @@ def process_csv(csv_path, categories, cleaning_actions):
     print(f"   ✅ Output: {total_rows_output:,} rows ({total_rows - total_rows_output:,} removed total)")
     print(f"   💾 Saved to: {output_path.name}")
     
-    return True
+    # Return summary stats
+    summary = {
+        'filename': csv_filename,
+        'input_rows': total_rows,
+        'output_rows': total_rows_output,
+        'rows_removed': total_rows - total_rows_output,
+        'columns_deleted': len(cols_to_delete),
+        'columns_cleaned': len(cols_to_clean),
+        'columns_copied': len(cols_to_copy),
+        'output_file': output_path.name
+    }
+    
+    return True, summary
 
 def main():
     print("=" * 60)
@@ -352,15 +362,175 @@ def main():
     
     print(f"📊 Found {len(csv_files)} CSV file(s)\n")
     
-    # Process each file
-    success_count = 0
+    # Process each file and collect summaries
+    summaries = []
     for csv_file in csv_files:
-        if process_csv(csv_file, categories, cleaning_actions):
-            success_count += 1
+        success, summary = process_csv(csv_file, categories, cleaning_actions)
+        if success and summary:
+            summaries.append(summary)
     
-    print("\n" + "=" * 60)
-    print(f"✨ COMPLETE: {success_count}/{len(csv_files)} files processed successfully")
-    print("=" * 60)
+    # Print final summary report
+    print("\n" + "=" * 80)
+    print("📊 CLEANING SUMMARY REPORT")
+    print("=" * 80)
+    
+    if summaries:
+        # Table header
+        print(f"\n{'File':<50} {'Input':<12} {'Output':<12} {'Removed':<10} {'Cols':<6}")
+        print("-" * 90)
+        
+        total_input = 0
+        total_output = 0
+        total_removed = 0
+        
+        for s in summaries:
+            total_input += s['input_rows']
+            total_output += s['output_rows']
+            total_removed += s['rows_removed']
+            
+            cols_summary = f"{s['columns_cleaned']}c/{s['columns_copied']}s"
+            
+            print(f"{s['output_file']:<50} {s['input_rows']:>11,} {s['output_rows']:>11,} {s['rows_removed']:>9,} {cols_summary:>6}")
+        
+        print("-" * 90)
+        print(f"{'TOTAL':<50} {total_input:>11,} {total_output:>11,} {total_removed:>9,}")
+        
+        # Additional stats
+        print(f"\n📈 Statistics:")
+        print(f"   • Files processed: {len(summaries)}/{len(csv_files)}")
+        print(f"   • Total rows processed: {total_input:,}")
+        print(f"   • Total rows output: {total_output:,}")
+        print(f"   • Total rows removed: {total_removed:,} ({total_removed/total_input*100:.1f}%)")
+        print(f"   • Data reduction: {(1 - total_output/total_input)*100:.1f}%")
+        
+        print(f"\n💾 Output location: {CLEANED_DATA}")
+        
+        # Generate markdown report
+        generate_cleaning_report(summaries, categories, cleaning_actions, total_input, total_output, total_removed)
+        
+    else:
+        print("\n❌ No files were successfully processed")
+    
+    print("\n" + "=" * 80)
+    print("✨ CLEANING COMPLETE")
+    print("=" * 80)
+
+def generate_cleaning_report(summaries, categories, cleaning_actions, total_input, total_output, total_removed):
+    """Generate detailed markdown report of cleaning actions"""
+    report_path = CLEANED_DATA / "00_Cleaning_Report.md"
+    
+    lines = [
+        "# Data Cleaning Report",
+        f"*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n",
+        "## Summary\n",
+        "| File | Input Rows | Output Rows | Rows Removed | % Removed |",
+        "|------|------------|-------------|--------------|-----------|"
+    ]
+    
+    for s in summaries:
+        pct_removed = (s['rows_removed'] / s['input_rows'] * 100) if s['input_rows'] > 0 else 0
+        lines.append(f"| {s['output_file']} | {s['input_rows']:,} | {s['output_rows']:,} | {s['rows_removed']:,} | {pct_removed:.1f}% |")
+    
+    total_pct = (total_removed / total_input * 100) if total_input > 0 else 0
+    lines.extend([
+        f"| **TOTAL** | **{total_input:,}** | **{total_output:,}** | **{total_removed:,}** | **{total_pct:.1f}%** |\n",
+        "## Overall Statistics\n",
+        f"- **Files Processed:** {len(summaries)}",
+        f"- **Total Input Rows:** {total_input:,}",
+        f"- **Total Output Rows:** {total_output:,}",
+        f"- **Total Rows Removed:** {total_removed:,}",
+        f"- **Data Reduction:** {(1 - total_output/total_input)*100:.1f}%\n",
+        "---\n",
+        "## Detailed Actions by File\n"
+    ])
+    
+    # Detailed breakdown for each file
+    for s in summaries:
+        original_name = s['filename']
+        
+        # Find category key
+        cat_key = None
+        for key in categories.keys():
+            if key == original_name or key.replace("sample_", "") == original_name.replace("sample_", ""):
+                cat_key = key
+                break
+        
+        if not cat_key:
+            continue
+            
+        file_categories = categories[cat_key]
+        
+        # Find action key
+        action_key = None
+        for key in cleaning_actions.keys():
+            if key == original_name or key == cat_key or key.replace("sample_", "") == original_name.replace("sample_", ""):
+                action_key = key
+                break
+        
+        file_actions = cleaning_actions.get(action_key, {}) if action_key else {}
+        
+        lines.extend([
+            f"### {s['output_file']}\n",
+            f"**Input:** {s['input_rows']:,} rows  ",
+            f"**Output:** {s['output_rows']:,} rows  ",
+            f"**Removed:** {s['rows_removed']:,} rows ({s['rows_removed']/s['input_rows']*100:.1f}%)\n"
+        ])
+        
+        # Columns deleted
+        deleted_cols = [col for col, cat in file_categories.items() if cat == 'IGNORE']
+        if deleted_cols:
+            lines.append(f"#### 🗑️ Deleted Columns ({len(deleted_cols)})\n")
+            for col in sorted(deleted_cols):
+                lines.append(f"- `{col}`")
+            lines.append("")
+        
+        # Columns cleaned
+        cleaned_cols = [(col, cat) for col, cat in file_categories.items() if cat in ['int', 'float', 'date']]
+        if cleaned_cols:
+            lines.append(f"#### 🧹 Cleaned Columns ({len(cleaned_cols)})\n")
+            for col, cat in sorted(cleaned_cols):
+                if col in file_actions:
+                    actions = file_actions[col]
+                    lines.append(f"**`{col}`** ({cat})")
+                    
+                    # Parsing errors
+                    if actions.get('parsing_errors') != 'keep':
+                        lines.append(f"  - Parsing errors: `{actions['parsing_errors']}`")
+                    
+                    # Outliers
+                    if cat == 'date':
+                        if actions.get('min_date') or actions.get('max_date'):
+                            lines.append(f"  - Date range: `{actions.get('min_date', 'N/A')}` to `{actions.get('max_date', 'N/A')}`")
+                        if actions.get('outliers') != 'keep':
+                            lines.append(f"  - Outliers: `{actions['outliers']}`")
+                    else:
+                        if actions.get('outliers') != 'keep':
+                            threshold = actions.get('outlier_threshold', 3.0)
+                            lines.append(f"  - Outliers (±{threshold}σ): `{actions['outliers']}`")
+                    
+                    # Negatives (numeric only)
+                    if cat in ['int', 'float'] and actions.get('negatives') != 'keep':
+                        lines.append(f"  - Negatives: `{actions['negatives']}`")
+                    
+                    # Missing
+                    if actions.get('missing') != 'keep':
+                        lines.append(f"  - Missing: `{actions['missing']}`")
+                    
+                    lines.append("")
+        
+        # Columns copied
+        copied_cols = [col for col, cat in file_categories.items() if cat == 'string']
+        if copied_cols:
+            lines.append(f"#### 📋 Copied As-Is ({len(copied_cols)})\n")
+            lines.append(", ".join(f"`{col}`" for col in sorted(copied_cols)))
+            lines.append("\n")
+        
+        lines.append("---\n")
+    
+    # Write report
+    report_content = "\n".join(lines)
+    report_path.write_text(report_content, encoding='utf-8')
+    print(f"   📄 Cleaning report saved: {report_path.name}")
 
 if __name__ == "__main__":
     main()
