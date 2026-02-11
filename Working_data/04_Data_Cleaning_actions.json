@@ -138,5 +138,241 @@
       "missing": "keep",
       "outlier_threshold": 3.0
     }
+  },
+  "sample_03_Assessor_-_Assessed_Values_2023_2025.csv": {
+    "pin": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "tax_year": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "class": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "median",
+      "outlier_threshold": 3.0
+    },
+    "township_code": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "neighborhood_code": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "mailed_bldg": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "mailed_land": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "mailed_tot": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "certified_bldg": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "mean",
+      "outlier_threshold": 3.0
+    },
+    "certified_land": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "mean",
+      "outlier_threshold": 3.0
+    },
+    "certified_tot": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "mean",
+      "outlier_threshold": 3.0
+    },
+    "board_bldg": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "mean",
+      "outlier_threshold": 3.0
+    },
+    "board_land": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "mean",
+      "outlier_threshold": 3.0
+    },
+    "board_tot": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "mean",
+      "outlier_threshold": 3.0
+    },
+    "row_id": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    }
+  },
+  "sample_04_Assessor_-_Single_and_Multi-Family_Improvement_Characteristics_20260205_websiteDL.csv": {
+    "pin": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "tax_year": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "class": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "township_code": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "year_built": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "building_sqft": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "land_sqft": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 1.0
+    },
+    "num_bedrooms": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "num_rooms": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "num_full_baths": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "num_half_baths": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "median",
+      "outlier_threshold": 3.0
+    },
+    "num_fireplaces": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "cap",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "garage_size": {
+      "category": "float",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    },
+    "row_id": {
+      "category": "int",
+      "parsing_errors": "keep",
+      "outliers": "remove",
+      "negatives": "keep",
+      "missing": "keep",
+      "outlier_threshold": 3.0
+    }
   }
 }

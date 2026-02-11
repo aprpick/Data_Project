@@ -7,10 +7,10 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 # Define folder paths
 RAW_DATA = PROJECT_ROOT / "Raw_Data"
-WORKING_DATA = PROJECT_ROOT / "Working_data"
+WORKING_DATA = PROJECT_ROOT / "Working_data\Sample_Data"
 
 # Sample size
-SAMPLE_SIZE = 1000
+SAMPLE_SIZE = 10000
 
 def sample_csv_files():
     """Sample 1000 rows from each CSV in Raw_Data and save to Working_data"""

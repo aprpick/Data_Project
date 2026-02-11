@@ -6,7 +6,7 @@ import re
 
 # --- CONFIGURATION ---
 PROJECT_ROOT = Path(__file__).parent.parent
-WORKING_DATA = PROJECT_ROOT / "Working_data"
+WORKING_DATA = PROJECT_ROOT / "Working_data\Sample_Data"
 CONFIG_FILE = WORKING_DATA / "02_Data_Categories.json"
 CATEGORIES = ["int", "float", "date", "string", "IGNORE"]
 

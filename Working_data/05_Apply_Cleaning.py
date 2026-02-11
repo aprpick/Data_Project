@@ -8,7 +8,7 @@ import sys
 # --- CONFIGURATION ---
 PROJECT_ROOT = Path(__file__).parent.parent  # Script is in Working_data, parent is project root
 RAW_DATA = PROJECT_ROOT / "Raw_Data"
-CLEANED_DATA = PROJECT_ROOT / "Cleaned_Data"
+CLEANED_DATA = PROJECT_ROOT / "Working_data\Cleaned_Data"
 WORKING_DATA = PROJECT_ROOT / "Working_data"
 CATEGORIES_FILE = WORKING_DATA / "02_Data_Categories.json"
 CLEANING_FILE = WORKING_DATA / "04_Data_Cleaning_actions.json"
