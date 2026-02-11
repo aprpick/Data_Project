@@ -79,6 +79,14 @@
       "negatives": "keep",
       "missing": "keep",
       "outlier_threshold": 3.0
+    },
+    "sale_date": {
+      "category": "date",
+      "parsing_errors": "keep",
+      "outliers": "keep",
+      "missing": "keep",
+      "min_date": "2023-01-01",
+      "max_date": "2025-12-19"
     }
   },
   "sample_02_Assessor_-_Parcel_Addresses_20260205.csv": {
